@@ -19,17 +19,35 @@ requirements:
         parser.add_argument("-s", "--submission_file", help="Submission File")
 
         args = parser.parse_args()
+        dd = {}
 
         if args.submission_file is None:
             prediction_file_status = "INVALID"
             invalid_reasons = ['Expected FileEntity type but found ' + args.entity_type]
         else:
-            with open(args.submission_file,"r") as sub_file:
-                message = sub_file.read()
             invalid_reasons = []
             prediction_file_status = "VALIDATED"
-            if not message.startswith("test"):
-                invalid_reasons.append("Submission must have test column")
+
+            try:
+                open(args.submission_file, "r")
+            except FileNotFoundError:
+                invalid_reasons = ["File could not be opened"]
+
+            if invalid_reasons == []:
+              try:
+                  # Parse out parameters into a dictionary
+                  for ele in open(args.submission_file,"r").readlines():
+                      dd[ele.split(":")[0].strip()] = float(ele.split(":")[1].strip())
+              except:
+                  invalid_reasons = ["File could not be parsed"]
+
+            if invalid_reasons == []:
+                try:
+                    dd["Generations"]
+                except KeyError:
+                    invalid_reasons = ['Could not fine "Generations" parameter, which is required for scoring']
+
+            if invalid_reasons != []:
                 prediction_file_status = "INVALID"
         result = {'submission_errors': "\n".join(invalid_reasons),
                   'submission_status': prediction_file_status}
@@ -72,4 +90,4 @@ arguments:
 
 hints:
   DockerRequirement:
-    dockerPull: python:3.9.1-slim-buster
+    dockerPull: tjstruck/popsim-pilot-slim:1.2

@@ -19,10 +19,25 @@ requirements:
         parser.add_argument("-g", "--goldstandard", required=True, help="Goldstandard for scoring")
 
         args = parser.parse_args()
-        score = 1 + 1
+        dd_submission = {}
+        dd_goldstandard = {}
+
+        from sklearn.metrics import mean_squared_error
+        import math
+
+        for ele in open(args.submissionfile,"r").readlines():
+            dd_submission[ele.split(":")[0].strip()] = float(ele.split(":")[1].strip())
+
+        for ele in open(args.goldstandard,"r").readlines():
+            dd_goldstandard[ele.split(":")[0].strip()] = float(ele.split(":")[1].strip())
+
+        tested_parameters = ["Generations"]
+
+        MSE = mean_squared_error([dd_goldstandard[params] for params in tested_parameters], [dd_submission[params] for params in tested_parameters])
+        RMSE = math.sqrt(MSE)
         prediction_file_status = "SCORED"
 
-        result = {'auc': score,
+        result = {'rmse': RMSE,
                   'submission_status': prediction_file_status}
         with open(args.results, 'w') as o:
           o.write(json.dumps(result))
