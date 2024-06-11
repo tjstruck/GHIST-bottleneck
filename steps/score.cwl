@@ -87,4 +87,4 @@ arguments:
 
 hints:
   DockerRequirement:
-    dockerPull: tjstruck/popsim-pilot-slim
+    dockerPull: tjstruck/popsim-pilot-slim:1.3
