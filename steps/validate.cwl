@@ -13,13 +13,13 @@ requirements:
         #!/usr/bin/env python
         import argparse
         import json
+        import yaml
         parser = argparse.ArgumentParser()
         parser.add_argument("-r", "--results", required=True, help="validation results")
         parser.add_argument("-e", "--entity_type", required=True, help="synapse entity type downloaded")
         parser.add_argument("-s", "--submission_file", help="Submission File")
 
         args = parser.parse_args()
-        dd = {}
 
         if args.submission_file is None:
             prediction_file_status = "INVALID"
@@ -34,18 +34,20 @@ requirements:
                 invalid_reasons = ["File could not be opened"]
 
             if invalid_reasons == []:
-              try:
-                  # Parse out parameters into a dictionary
-                  for ele in open(args.submission_file,"r").readlines():
-                      dd[ele.split(":")[0].strip()] = float(ele.split(":")[1].strip())
-              except:
-                  invalid_reasons = ["File could not be parsed"]
+
+              exc = 'No error'
+              with open(args.submission_file) as stream:
+                  try:
+                      fi = yaml.safe_load(stream)
+                  except yaml.YAMLError as exc:
+                      invalid_reasons = [exc]
 
             if invalid_reasons == []:
                 try:
-                    dd["Generations"]
+                    fi['parameters']['population_size']
+                    fi['parameters']['generations']
                 except KeyError:
-                    invalid_reasons = ['Could not fine "Generations" parameter, which is required for scoring']
+                    invalid_reasons = ['Could not find one or more parameters, which are required for scoring']
 
             if invalid_reasons != []:
                 prediction_file_status = "INVALID"
