@@ -45,7 +45,7 @@ requirements:
             except yaml.YAMLError as exc:
                 print(exc)
 
-        keys = goldstandard['parameters']
+        keys = list(goldstandard['parameters'].keys())
         keys.sort()
         RRMSE = relative_root_mean_squared_error(np.array([goldstandard['parameters'][key] for key in keys]), np.array([submission['parameters'][key] for key in keys]))
         prediction_file_status = "SCORED"
