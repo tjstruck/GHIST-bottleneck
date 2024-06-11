@@ -19,25 +19,43 @@ requirements:
         parser.add_argument("-g", "--goldstandard", required=True, help="Goldstandard for scoring")
 
         args = parser.parse_args()
-        dd_submission = {}
+        sub_yaml = {}
         dd_goldstandard = {}
 
         from sklearn.metrics import mean_squared_error
         import math
+        import yaml
 
-        for ele in open(args.submissionfile,"r").readlines():
-            dd_submission[ele.split(":")[0].strip()] = float(ele.split(":")[1].strip())
+        import numpy as np
+        def relative_root_mean_squared_error(true, pred):
+            n = len(true) # update
+            num = np.sum(np.square(true - pred)) / n  # update
+            den = np.sum(np.square(pred))
+            squared_error = num/den
+            rrmse_loss = np.sqrt(squared_error)
+            return rrmse_loss
 
-        for ele in open(args.goldstandard,"r").readlines():
-            dd_goldstandard[ele.split(":")[0].strip()] = float(ele.split(":")[1].strip())
+        exc = 'No error'
+        with open(args.submissionfile) as stream:
+            try:
+                submission = yaml.safe_load(stream)
+            except yaml.YAMLError as exc:
+                print(exc)
 
-        tested_parameters = ["Generations"]
 
-        MSE = mean_squared_error([dd_goldstandard[params] for params in tested_parameters], [dd_submission[params] for params in tested_parameters])
-        RMSE = math.sqrt(MSE)
+        exc = 'No error'
+        with open(args.goldstandard) as stream:
+            try:
+                goldstandard = yaml.safe_load(stream)
+            except yaml.YAMLError as exc:
+                print(exc)
+
+        keys = goldstandard['parameters']
+        keys.sort()
+        RRMSE = relative_root_mean_squared_error(np.array([goldstandard['parameters'][key] for key in keys]), np.array([submission['parameters'][key] for key in keys]))
         prediction_file_status = "SCORED"
 
-        result = {'rmse': RMSE,
+        result = {'rrmse': RRMSE,
                   'submission_status': prediction_file_status}
         with open(args.results, 'w') as o:
           o.write(json.dumps(result))
