@@ -92,4 +92,4 @@ arguments:
 
 hints:
   DockerRequirement:
-    dockerPull: tjstruck/popsim-pilot-slim:1.2
+    dockerPull: python:3.9.1-slim-buster

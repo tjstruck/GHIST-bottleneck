@@ -19,13 +19,8 @@ requirements:
         parser.add_argument("-g", "--goldstandard", required=True, help="Goldstandard for scoring")
 
         args = parser.parse_args()
-        sub_yaml = {}
-        dd_goldstandard = {}
 
-        from sklearn.metrics import mean_squared_error
-        import math
         import yaml
-
         import numpy as np
         def relative_root_mean_squared_error(true, pred):
             n = len(true) # update
@@ -92,4 +87,4 @@ arguments:
 
 hints:
   DockerRequirement:
-    dockerPull: tjstruck/popsim-pilot-slim:1.2
+    dockerPull: python:3.9.1-slim-buster
