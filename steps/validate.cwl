@@ -44,8 +44,8 @@ requirements:
 
             if invalid_reasons == []:
                 try:
-                    fi['parameters']['population_size']
                     fi['parameters']['generations']
+                    fi['parameters']['post_decline_fraction']
                 except KeyError:
                     invalid_reasons = ['Could not find one or more parameters, which are required for scoring']
 
