@@ -24,11 +24,9 @@ requirements:
         import numpy as np
         def relative_root_mean_squared_error(true, pred):
             n = len(true) # update
-            num = np.sum(np.square(true - pred)) / n  # update
-            den = np.sum(np.square(pred))
-            squared_error = num/den
-            rrmse_loss = np.sqrt(squared_error)
-            return rrmse_loss
+            squared_error = np.square((true - pred) / true)
+            rrmse = np.sqrt(np.sum(squared_error))
+            return rrmse
 
         exc = 'No error'
         with open(args.submissionfile) as stream:
